@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>マイ・テキストエディタ</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f6fa;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 92vh;
+        }
+        .toolbar {
+            background-color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover { background-color: #2980b9; }
+        button.clear { background-color: #e74c3c; }
+        button.clear:hover { background-color: #c0392b; }
+        
+        /* 💡 ここがエディタの入力エリアの肝 */
+        textarea {
+            flex: 1;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 20px;
+            font-size: 16px;
+            line-height: 1.6;
+            border: 1px solid #dcdde1;
+            border-radius: 8px;
+            resize: none; /* 枠のサイズ変更を無効化 */
+            outline: none;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
+        textarea:focus { border-color: #3498db; }
+        
+        .status-bar {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #7f8c8d;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toolbar">
+        <button onclick="downloadText()">💾 パソコンに保存</button>
+        <button class="clear" onclick="clearText()">🗑️ 全消去</button>
+    </div>
+
+    <textarea id="editor" placeholder="ここに文章を入力してください..."></textarea>
+
+    <div class="status-bar">
+        文字数: <span id="char-count">0</span> 文字
+    </div>
+
+    <script>
+        const editor = document.getElementById('editor');
+        const charCount = document.getElementById('char-count');
+
+        // 📝 文字数をリアルタイムで数える機能
+        editor.addEventListener('input', () => {
+            charCount.innerText = editor.value.length;
+        });
+
+        // 💾 テキストをファイルとしてダウンロードする機能
+        function downloadText() {
+            const text = editor.value;
+            if (!text) {
+                alert('中身が空っぽですよ！');
+                return;
+            }
+            
+            // 魔法のコード：テキストデータをファイル（Blob）に変換
+            const blob = new Blob([text], { type: 'text/plain' });
+            const link = document.createElement('a');
+            
+            link.href = URL.createObjectURL(blob);
+            link.download = 'memo.txt'; // 保存時のファイル名
+            link.click();
+            
+            // メモリ解放
+            URL.revokeObjectURL(link.href);
+        }
+
+        // 🗑️ 全消去機能
+        function clearText() {
+            if (confirm('本当にすべて消去しますか？')) {
+                editor.value = '';
+                charCount.innerText = 0;
+            }
+        }
+    </script>
+</body>
+</html>
